@@ -15,7 +15,7 @@ ros::NodeHandle nh;
 long publisher_timer;
 
 //Motor driver stack 1
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();//0x60
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); //0x60
 
 Adafruit_DCMotor *LMotor = AFMS.getMotor(2);
 Adafruit_DCMotor *RMotor = AFMS.getMotor(3);
@@ -30,28 +30,22 @@ Adafruit_DCMotor *RMotor = AFMS.getMotor(3);
 int encoderPosR = 0;
 int encoderPosL = 0;
 
-void doEncoderA(const int encoderPinA){ // 빨녹일 때
-  if(encoderPinA==2){
-    encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?1:-1;
-  }
-  else if(encoderPinA==18){
-    encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?1:-1;
-  }
+void getEncoder_LA(){ // pin 18,19
+  encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?1:-1;
 }
-
-void doEncoderB(const int encoderPinB){ // 보파일 때
-  if(encoderPinB==3){
-    encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?-1:1;
-  }
-  else if(encoderPinB==19){
-    encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?-1:1;
-  }
+void getEncoder_LB(){ // pin 18,19
+  encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?-1:1;
+}
+void getEncoder_RA(){ // pin 2, 3
+  encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?1:-1;
+}
+void getEncoder_RB(){ // pin 2, 3
+  encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?-1:1;
 }
 
 void forward(const float cmd){
    LMotor->run(FORWARD);
    RMotor->run(FORWARD);
-
    LMotor->setSpeed(cmd*10);
    RMotor->setSpeed(cmd*10);
 }
@@ -62,7 +56,6 @@ void turn(const float cmd){
    RMotor->run(BACKWARD);
    LMotor->setSpeed(cmd*10);
    RMotor->setSpeed(cmd*10);
-   
   }
   else{
    LMotor->run(BACKWARD);
@@ -70,7 +63,6 @@ void turn(const float cmd){
    LMotor->setSpeed(cmd*10);
    RMotor->setSpeed(cmd*10);
   }
-  
 }
 
 void cmdCallback(const geometry_msgs::Twist& cmd_vel_msg){
@@ -90,10 +82,10 @@ void setup() {
   pinMode(encoderPinLA, INPUT_PULLUP);
   pinMode(encoderPinLB, INPUT_PULLUP);
   
-  attachInterrupt(0,doEncoderA(encoderPinRA),CHANGE); //2
-  attachInterrupt(1,doEncoderB(encoderPinRB),CHANGE); //3
-  attachInterrupt(5,doEncoderA(encoderPinLA),CHANGE); //18
-  attachInterrupt(4,doEncoderB(encoderPinLB),CHANGE); //19
+  attachInterrupt(0,getEncoder_LA,CHANGE); //2
+  attachInterrupt(1,getEncoder_LB,CHANGE); //3
+  attachInterrupt(5,getEncoder_RA,CHANGE); //18
+  attachInterrupt(4,getEncoder_RB,CHANGE); //19
 
   Serial.begin(115200);
 }
@@ -104,7 +96,6 @@ void loop() {
   int length = data.indexOf("C")+2;
   char data_final[length+1];
   data.toCharArray(data_final, length+1);
-
 
   if (millis() > publisher_timer) {
     // step 1: request reading from sensor
