@@ -14,6 +14,6 @@ Couser-Bot repo by Oroca Pangyo
 ....CouserBot_motor_driver.cpp  
 ....CouserBot_sensor.cpp  
 ..CouserBot.h  
-Couser_core.ino  
+CouserBot_core.ino  
 CouserBot_v1.h  
 CouserBot_core_config  
