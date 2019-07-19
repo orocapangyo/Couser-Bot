@@ -20,62 +20,27 @@
 #define CouserBot_MOTOR_DRIVER_H_
 
 #include "variant.h"
-//#include <DynamixelSDK.h>
 #include <Adafruit_MotorShield.h>
 
 #define BAUDRATE 115200
 #define PROTOCOL_VERSION 1.0
 #define LEFT_WHEEL 2
 #define RIGHT_WHEEL 3
-#define DCMOTOR_LIMIT_MAX_VELOCITY 255
+#define DCMOTOR_LIMIT_MAX_VELOCITY 200
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *LMotor = AFMS.getMotor(LEFT_WHEEL);
 Adafruit_DCMotor *RMotor = AFMS.getMotor(RIGHT_WHEEL);
 
-/*
-// Control table address (Dynamixel X-series)
-#define ADDR_X_TORQUE_ENABLE            64
-#define ADDR_X_GOAL_VELOCITY            104
-#define ADDR_X_GOAL_POSITION            116
-#define ADDR_X_REALTIME_TICK            120
-#define ADDR_X_PRESENT_VELOCITY         128
-#define ADDR_X_PRESENT_POSITION         132
-
-// Limit values (XM430-W210-T and XM430-W350-T)
-#define BURGER_DXL_LIMIT_MAX_VELOCITY            265     // MAX RPM is 61 when XL is powered 12.0V
-#define WAFFLE_DXL_LIMIT_MAX_VELOCITY            330     // MAX RPM is 77 when XM is powered 12.0V
-
-// Data Byte Length
-#define LEN_X_TORQUE_ENABLE             1
-#define LEN_X_GOAL_VELOCITY             4
-#define LEN_X_GOAL_POSITION             4
-#define LEN_X_REALTIME_TICK             2
-#define LEN_X_PRESENT_VELOCITY          4
-#define LEN_X_PRESENT_POSITION          4
-
-#define PROTOCOL_VERSION                2.0     // Dynamixel protocol version 2.0
-
-#define DXL_LEFT_ID                     1       // ID of left motor
-#define DXL_RIGHT_ID                    2       // ID of right motor
-
-#define BAUDRATE                        1000000 // baurd rate of Dynamixel
-#define DEVICENAME                      ""      // no need setting on OpenCR
-
-#define TORQUE_ENABLE                   1       // Value for enabling the torque
-#define TORQUE_DISABLE                  0       // Value for disabling the torque
-
 #define LEFT                            0
 #define RIGHT                           1
 
-#define VELOCITY_CONSTANT_VALUE         41.69988758  // V = r * w = r     *        (RPM             * 0.10472)
-                                                     //           = r     * (0.229 * Goal_Velocity) * 0.10472
-                                                     //
-                                                     // Goal_Velocity = V / r * 41.69988757710309
-
-#define DEBUG_SERIAL  SerialBT2
-
-*/
+#define MOTOR_VELOCITY_COEFFICIENT      535
+#define SCALING_FACTOR                  0.067
+// Motor 감속비 56:1, 모터정격rpm 5100 RPM, 정격 토크 60 gfcm
+// Wheel rpm : 91 RPM
+// w_wheel [rpm] = (V/r) * (60/2*pi)
+// w_motor [rpm] = 56 * w_wheel
 
 class CouserBotMotorDriver
 {
@@ -84,7 +49,7 @@ class CouserBotMotorDriver
   ~CouserBotMotorDriver();
   bool init(String couserbot);
   void close(void);
-  bool runMotor(int64_t left_value, int64_t right_value);
+  bool controlMotor(const float wheel_radius, const float wheel_separation, float* value);
   
  private:
   uint32_t baudrate_;
