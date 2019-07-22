@@ -70,3 +70,51 @@ bool CouserBotMotorDriver::controlMotor(const float wheel_radius, const float wh
 
  return true;
 }
+
+bool CouserBotMotorDriver::readEncoder(int32_t &left_value, int32_t &right_value)
+{
+  //Encoder 값 받아오기
+  //Encoder 값 Calibration
+  //sensor_state_msg에 left_encoder, right_encoder 값 넣기
+
+  //*** sensor_state_msg.left_encoder, sensor_state_msg.right_encoder 
+  
+  
+  
+  
+  /*
+  int dxl_comm_result = COMM_TX_FAIL;              // Communication result
+  bool dxl_addparam_result = false;                // addParam result
+  bool dxl_getdata_result = false;                 // GetParam result
+
+  // Set parameter
+  dxl_addparam_result = groupSyncReadEncoder_->addParam(left_wheel_id_);
+  if (dxl_addparam_result != true)
+    return false;
+
+  dxl_addparam_result = groupSyncReadEncoder_->addParam(right_wheel_id_);
+  if (dxl_addparam_result != true)
+    return false;
+
+  // Syncread present position
+  dxl_comm_result = groupSyncReadEncoder_->txRxPacket();
+  if (dxl_comm_result != COMM_SUCCESS)
+    Serial.println(packetHandler_->getTxRxResult(dxl_comm_result));
+
+  // Check if groupSyncRead data of Dynamixels are available
+  dxl_getdata_result = groupSyncReadEncoder_->isAvailable(left_wheel_id_, ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+  if (dxl_getdata_result != true)
+    return false;
+
+  dxl_getdata_result = groupSyncReadEncoder_->isAvailable(right_wheel_id_, ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+  if (dxl_getdata_result != true)
+    return false;
+
+  // Get data
+  left_value  = groupSyncReadEncoder_->getData(left_wheel_id_,  ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+  right_value = groupSyncReadEncoder_->getData(right_wheel_id_, ADDR_X_PRESENT_POSITION, LEN_X_PRESENT_POSITION);
+
+  groupSyncReadEncoder_->clearParam();
+  */
+  return true;
+}
