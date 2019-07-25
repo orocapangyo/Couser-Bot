@@ -16,7 +16,7 @@
 
 /* Authors: YooDnseok Pyo, Leon Jung, Darby Lim, HanCheol Cho, Gilbert */
 
-#include "turtlebot3_core_config.h"
+#include "CouserBot_core_config.h"
 
 /*******************************************************************************
 * Setup function
@@ -65,6 +65,16 @@ void setup()
   prev_update_time = millis();
 
   pinMode(LED_WORKING_CHECK, OUTPUT);
+
+  pinMode(encoderPinRA, INPUT_PULLUP);
+  pinMode(encoderPinRB, INPUT_PULLUP);
+  pinMode(encoderPinLA, INPUT_PULLUP);
+  pinMode(encoderPinLB, INPUT_PULLUP);
+  
+  attachInterrupt(0,getEncoder_LA,CHANGE); //2
+  attachInterrupt(1,getEncoder_LB,CHANGE); //3
+  attachInterrupt(5,getEncoder_RA,CHANGE); //18
+  attachInterrupt(4,getEncoder_RB,CHANGE); //19
 
   setup_end = true;
 }
@@ -155,6 +165,23 @@ void loop()
 
   // Wait the serial link time to process
   waitForSerialLink(nh.connected());
+}
+
+/*******************************************************************************
+* Interrupt Function(Encoder)
+*******************************************************************************/
+
+void getEncoder_LA(){ // pin 18,19
+  encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?1:-1;
+}
+void getEncoder_LB(){ // pin 18,19
+  encoderPosL += (digitalRead(encoderPinLA)==digitalRead(encoderPinLB))?-1:1;
+}
+void getEncoder_RA(){ // pin 2, 3
+  encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?1:-1;
+}
+void getEncoder_RB(){ // pin 2, 3
+  encoderPosR += (digitalRead(encoderPinRA)==digitalRead(encoderPinRB))?-1:1;
 }
 
 /*******************************************************************************
@@ -258,7 +285,7 @@ void publishSensorStateMsg(void)
   sensor_state_msg.header.stamp = rosNow();
   sensor_state_msg.battery = sensors.checkVoltage();
 
-  dxl_comm_result = motor_driver.readEncoder(sensor_state_msg.left_encoder, sensor_state_msg.right_encoder);
+  dxl_comm_result = motor_driver.readEncoder(encoderPosL, encoderPosR, sensor_state_msg.left_encoder, sensor_state_msg.right_encoder);
 
   if (dxl_comm_result == true)
     updateMotorInfo(sensor_state_msg.left_encoder, sensor_state_msg.right_encoder);
