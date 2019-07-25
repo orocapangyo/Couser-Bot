@@ -50,20 +50,12 @@ class CouserBotMotorDriver
   bool init(String couserbot);
   void close(void);
   bool controlMotor(const float wheel_radius, const float wheel_separation, float* value);
+  bool readEncoder(int32_t &left_value, int32_t &right_value, int32_t &left_encoder, int32_t &right_encoder);
   
  private:
   uint32_t baudrate_;
   float  protocol_version_;
-  bool torque_;
-
   uint16_t dcmotor_limit_max_velocity_;
-  //uint16_t dynamixel_limit_max_velocity_;
-
-  //dynamixel::PortHandler *portHandler_;
-  //dynamixel::PacketHandler *packetHandler_;
-
-  //dynamixel::GroupSyncWrite *groupSyncWriteVelocity_;
-  //dynamixel::GroupSyncRead *groupSyncReadEncoder_;
 };
 
 #endif // COUSERBOT_MOTOR_DRIVER_H_
