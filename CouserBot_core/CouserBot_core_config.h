@@ -16,8 +16,8 @@
 
 /* Authors: Yoonseok Pyo, Leon Jung, Darby Lim, HanCheol Cho, Gilbert */
 
-#define CouserBot_CORE_CONFIG_H_
 #ifndef CouserBot_CORE_CONFIG_H_
+#define CouserBot_CORE_CONFIG_H_
 
 #include <ros.h>
 #include <ros/time.h>
@@ -68,6 +68,11 @@
 
 #define TEST_DISTANCE                    0.300     // meter
 #define TEST_RADIAN                      3.14      // 180 degree
+
+#define encoderPinRA 2
+#define encoderPinRB 3
+#define encoderPinLA 18
+#define encoderPinLB 19
 
 // #define DEBUG                            
 #define DEBUG_SERIAL                     SerialBT2
@@ -237,5 +242,11 @@ double odom_vel[3];
 *******************************************************************************/
 bool setup_end        = false;
 uint8_t battery_state = 0;
+
+/*******************************************************************************
+* Declaration for Encoder
+*******************************************************************************/
+int32_t encoderPosR = 0;
+int32_t encoderPosL = 0;
 
 #endif // COUSERBOT_CORE_CONFIG_H_
