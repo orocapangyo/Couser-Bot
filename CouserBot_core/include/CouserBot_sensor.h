@@ -16,16 +16,16 @@
 
 /* Authors: Yoonseok Pyo, Leon Jung, Darby Lim, HanCheol Cho, Gilbert */
 
-#ifndef TURTLEBOT3_SENSOR_H_
-#define TURTLEBOT3_SENSOR_H_
+#ifndef CouserBot_SENSOR_H_
+#define CouserBot_SENSOR_H_
 
-#include <IMU.h>
+//#include <IMU.h>
 
 #include <sensor_msgs/Imu.h>
-#include <sensor_msgs/BatteryState.h>
-#include <sensor_msgs/MagneticField.h>
+//#include <sensor_msgs/BatteryState.h>
+//#include <sensor_msgs/MagneticField.h>
 
-#include "OLLO.h"
+//#include "OLLO.h"
 
 #define ACCEL_FACTOR                      0.000598550415   // (ADC_Value / Scale) * 9.80665            => Range : +- 2[g]
                                                            //                                             Scale : +- 16384
@@ -36,6 +36,8 @@
 
 #define DEBUG_SERIAL  SerialBT2
 
+
+/*
 typedef struct LED_PIN_ARRAY
 {
   int front_left;
@@ -49,12 +51,12 @@ typedef struct SONAR_PIN
   int trig;
   int echo;
 }SonarPin;
-
-class Turtlebot3Sensor
+*/
+class CouserBotSensor
 {
  public:
-  Turtlebot3Sensor();
-  ~Turtlebot3Sensor();
+	 CouserBotSensor();
+  ~CouserBotSensor();
 
   bool init(void);
 
@@ -65,8 +67,11 @@ class Turtlebot3Sensor
   void calibrationGyro(void);
 
   float* getOrientation(void);
-  sensor_msgs::MagneticField getMag(void);
-
+  float ax, ay, az;
+  float gx, gy, gz;
+  
+  //sensor_msgs::MagneticField getMag(void);
+  /*
   // Battery
   float checkVoltage(void);
 
@@ -96,18 +101,21 @@ class Turtlebot3Sensor
   // led pattern
   void initLED(void);
   void setLedPattern(double linear_vel, double angular_vel);
+  */
  private:
   sensor_msgs::Imu           imu_msg_;
   sensor_msgs::BatteryState  battery_state_msg_;
-  sensor_msgs::MagneticField mag_msg_;
+  //sensor_msgs::MagneticField mag_msg_;
 
   cIMU imu_;
+  /*
   OLLO ollo_;
 
   LedPinArray led_pin_array_;
   SonarPin sonar_pin_;
 
   float sonar_data_;
+  */
 };
 
 #endif // TURTLEBOT3_SENSOR_H_
