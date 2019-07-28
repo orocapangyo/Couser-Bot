@@ -16,26 +16,31 @@
 
 /* Authors: Yoonseok Pyo, Leon Jung, Darby Lim, HanCheol Cho, Gilbert */
 
-#include "../../include/turtlebot3/turtlebot3_sensor.h"
+#include "../../include/CouserBot_sensor.h"
+#include "../../include/MPU9250.h"
+#include "stdint.h"
 
-Turtlebot3Sensor::Turtlebot3Sensor()
+
+MPU9250 accelgyro;
+
+CouserBotSensor::CouserBotSensor()
 {
 }
 
-Turtlebot3Sensor::~Turtlebot3Sensor()
+CouserBotSensor::~CouserBotSensor()
 {
   DEBUG_SERIAL.end();
 }
 
-bool Turtlebot3Sensor::init(void)
+bool CouserBotSensor::init(string couserbot)
 {
   DEBUG_SERIAL.begin(57600);
 
-  initBumper();
-  initIR();
-  initSonar();
-  initLED();
-
+ // initBumper();
+  //initIR();
+  //initSonar();
+  //initLED();
+  /*
   uint8_t get_error_code = 0x00;
 
   battery_state_msg_.current         = NAN;
@@ -43,42 +48,39 @@ bool Turtlebot3Sensor::init(void)
   battery_state_msg_.capacity        = NAN;
   battery_state_msg_.design_capacity = NAN;
   battery_state_msg_.percentage      = NAN;
-
-  get_error_code = imu_.begin();
-
-  if (get_error_code != 0x00)
-    DEBUG_SERIAL.println("Failed to init Sensor");
-  else
+  */
     DEBUG_SERIAL.println("Success to init Sensor");
+	return true;
 
-  return get_error_code;
+  
 }
 
-void Turtlebot3Sensor::initIMU(void)
+void CouserBotSensor::initIMU(void)
 {
-  imu_.begin();
+	accelgyro.initialize();
 }
 
-void Turtlebot3Sensor::updateIMU(void)
+void CouserBotSensor::updateIMU(void)
 {
-  imu_.update();
+	accelgyro.getMotion6(&ax,&ay,&az,&gx,&gy,&gz);
+	
 }
 
-void Turtlebot3Sensor::calibrationGyro()
+void CouserBotSensor::calibrationGyro()
 {
   uint32_t pre_time;
   uint32_t t_time;
 
-  const uint8_t led_ros_connect = 3;
+  //const uint8_t led_ros_connect = 3;
 
-  imu_.SEN.gyro_cali_start();
+  uint16_t calibrateG = 512;
   
   t_time   = millis();
   pre_time = millis();
 
-  while(!imu_.SEN.gyro_cali_get_done())
+  while(!(accelgyro.cali_done())
   {
-    imu_.update();
+	  accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
 
     if (millis()-pre_time > 5000)
     {
@@ -87,17 +89,19 @@ void Turtlebot3Sensor::calibrationGyro()
     if (millis()-t_time > 100)
     {
       t_time = millis();
-      setLedToggle(led_ros_connect);
+      //setLedToggle(led_ros_connect);
     }
+	calibrateG--;
   }
 }
 
-sensor_msgs::Imu Turtlebot3Sensor::getIMU(void)
+sensor_msgs::Imu CouserBotSensor::getIMU(void)
 {
-  imu_msg_.angular_velocity.x = imu_.SEN.gyroADC[0] * GYRO_FACTOR;
-  imu_msg_.angular_velocity.y = imu_.SEN.gyroADC[1] * GYRO_FACTOR;
-  imu_msg_.angular_velocity.z = imu_.SEN.gyroADC[2] * GYRO_FACTOR;
-  imu_msg_.angular_velocity_covariance[0] = 0.02;
+	
+  imu_msg_.angular_velocity.x = gx * GYRO_FACTOR;
+  imu_msg_.angular_velocity.y = gy * GYRO_FACTOR;
+  imu_msg_.angular_velocity.z = gz * GYRO_FACTOR;
+ /* imu_msg_.angular_velocity_covariance[0] = 0.02;
   imu_msg_.angular_velocity_covariance[1] = 0;
   imu_msg_.angular_velocity_covariance[2] = 0;
   imu_msg_.angular_velocity_covariance[3] = 0;
@@ -106,11 +110,11 @@ sensor_msgs::Imu Turtlebot3Sensor::getIMU(void)
   imu_msg_.angular_velocity_covariance[6] = 0;
   imu_msg_.angular_velocity_covariance[7] = 0;
   imu_msg_.angular_velocity_covariance[8] = 0.02;
-
-  imu_msg_.linear_acceleration.x = imu_.SEN.accADC[0] * ACCEL_FACTOR;
-  imu_msg_.linear_acceleration.y = imu_.SEN.accADC[1] * ACCEL_FACTOR;
-  imu_msg_.linear_acceleration.z = imu_.SEN.accADC[2] * ACCEL_FACTOR;
-
+  */
+  imu_msg_.linear_acceleration.x = ax * ACCEL_FACTOR;
+  imu_msg_.linear_acceleration.y = ay * ACCEL_FACTOR;
+  imu_msg_.linear_acceleration.z = az * ACCEL_FACTOR;
+  /*
   imu_msg_.linear_acceleration_covariance[0] = 0.04;
   imu_msg_.linear_acceleration_covariance[1] = 0;
   imu_msg_.linear_acceleration_covariance[2] = 0;
@@ -120,12 +124,15 @@ sensor_msgs::Imu Turtlebot3Sensor::getIMU(void)
   imu_msg_.linear_acceleration_covariance[6] = 0;
   imu_msg_.linear_acceleration_covariance[7] = 0;
   imu_msg_.linear_acceleration_covariance[8] = 0.04;
+  */
 
+  /*
   imu_msg_.orientation.w = imu_.quat[0];
   imu_msg_.orientation.x = imu_.quat[1];
   imu_msg_.orientation.y = imu_.quat[2];
   imu_msg_.orientation.z = imu_.quat[3];
-
+  */
+  /*
   imu_msg_.orientation_covariance[0] = 0.0025;
   imu_msg_.orientation_covariance[1] = 0;
   imu_msg_.orientation_covariance[2] = 0;
@@ -135,11 +142,11 @@ sensor_msgs::Imu Turtlebot3Sensor::getIMU(void)
   imu_msg_.orientation_covariance[6] = 0;
   imu_msg_.orientation_covariance[7] = 0;
   imu_msg_.orientation_covariance[8] = 0.0025;
-
+  */
   return imu_msg_;
 }
-
-float* Turtlebot3Sensor::getOrientation(void)
+/*
+float* CouserBotSensor::getOrientation(void)
 {
   static float orientation[4];
 
@@ -150,7 +157,8 @@ float* Turtlebot3Sensor::getOrientation(void)
 
   return orientation;
 }
-
+*/
+/*
 sensor_msgs::MagneticField Turtlebot3Sensor::getMag(void)
 {
   mag_msg_.magnetic_field.x = imu_.SEN.magADC[0] * MAG_FACTOR;
@@ -447,6 +455,7 @@ void Turtlebot3Sensor::setLedPattern(double linear_vel, double angular_vel)
     digitalWrite(led_pin_array_.back_left, LOW);
     digitalWrite(led_pin_array_.back_right, LOW);
   }
+  */
 }
 
 
